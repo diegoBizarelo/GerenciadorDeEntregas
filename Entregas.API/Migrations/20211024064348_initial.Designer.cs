@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Entregas.API.Migrations
 {
     [DbContext(typeof(EntregasContext))]
-    [Migration("20211024063607_initial")]
+    [Migration("20211024064348_initial")]
     partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
