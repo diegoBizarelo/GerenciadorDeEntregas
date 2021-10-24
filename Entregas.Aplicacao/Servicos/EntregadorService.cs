@@ -8,9 +8,5 @@ namespace Entregas.Aplicacao.Servicos
     public class EntregadorService
     {
         public Boolean Disponivel { get; set; }
-        public List<Entregador> GetEntregadors()
-        {
-
-        }
     }
 }
