@@ -1,57 +1,68 @@
-﻿using Entregas.Dominio.Core.Repository;
+﻿using Entregas.Data.Context;
+using Entregas.Dominio.Core.Repository;
 using Gerenciador.Entregas.Core.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Entregas.Data.Repository
 {
-    public abstract class BaseRepository<T> : IRepository<T> where T : Entity
+    public abstract class BaseRepository<T> : IRepository<T> where T : Entity, new()
     {
-        public BaseRepository()
-        {
+        protected readonly EntregasContext Db;
+        protected readonly DbSet<T> DbSet;
 
-        }
-        public Task Adicionar(T entity)
+        public BaseRepository(EntregasContext db)
         {
-            throw new NotImplementedException();
+            Db = db;
+            DbSet = db.Set<T>();
         }
 
-        public Task<IEnumerable<T>> Buscar(Expression<Func<T, bool>> predicate)
+        public virtual async Task<T> ObterPorId(Guid id)
         {
-            throw new NotImplementedException();
+            return await DbSet.FindAsync(id);
+        }
+
+        public virtual async Task<List<T>> ObterTodos()
+        {
+            return await DbSet.ToListAsync();
+        }
+
+        public virtual async Task Adicionar(T entity)
+        {
+            DbSet.Add(entity);
+            await Salvar();
+        }
+
+        public virtual async Task<IEnumerable<T>> Buscar(Expression<Func<T, bool>> predicate)
+        {
+            return await DbSet.AsNoTracking().Where(predicate).ToListAsync();
+        }
+
+        public virtual async Task Editar(T entity)
+        {
+            DbSet.Add(entity);
+            await Salvar();
+        }
+
+        public virtual async Task Remover(Guid id)
+        {
+            DbSet.Remove(new T { Id = id });
+            await Salvar();
+        }
+
+        public async Task<int> Salvar()
+        {
+            return await Db.SaveChangesAsync();
         }
 
         public void Dispose()
         {
-            throw new NotImplementedException();
-        }
-
-        public Task Editar(T entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<T> ObterPorId(Guid id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<T>> ObterTodos()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task Remover(Guid id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<int> Salvar()
-        {
-            throw new NotImplementedException();
+            Db?.Dispose();
         }
     }
 }
